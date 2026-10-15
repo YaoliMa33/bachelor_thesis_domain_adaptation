@@ -51,4 +51,4 @@ Accuracy is first averaged equally over the nine tasks within each group, then s
 - `results/mspa/summary.csv`: mean accuracy and sample SD across groups.
 - `results/mspa/summary.json`: the same statistics plus exact seed groups and aggregation settings.
 
-Results and checkpoints are generated locally and are not included in this source folder. Re-running into the same output path replaces files with the same names; use separate output folders for different training configurations. For preprocessing, labels and shared training details, see the repository README.
+Results and checkpoints are generated locally and are not included in this source folder. Re-running into the same output path replaces files with the same names; use separate output folders for different training configurations. For preprocessing and shared training details, see the [UCI training guide](../README.md); labels and provenance are in the [UCI dataset guide](../../uci_dataset_128d/README.md).
