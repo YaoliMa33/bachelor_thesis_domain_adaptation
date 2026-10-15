@@ -1,0 +1,20 @@
+{
+  "raw_label_to_gas": {
+    "1": "Ethanol",
+    "2": "Ethylene",
+    "3": "Ammonia",
+    "4": "Acetaldehyde",
+    "5": "Acetone",
+    "6": "Toluene"
+  },
+  "training_index_to_gas": {
+    "0": "Ethanol",
+    "1": "Ethylene",
+    "2": "Ammonia",
+    "3": "Acetaldehyde",
+    "4": "Acetone",
+    "5": "Toluene"
+  },
+  "raw_labels_modified": false,
+  "source": "https://archive.ics.uci.edu/static/public/270/gas%2Bsensor%2Barray%2Bdrift%2Bdataset%2Bat%2Bdifferent%2Bconcentrations.zip"
+}

@@ -1,0 +1,4 @@
+# Preserve published data bytes across platforms.
+*.csv -text
+*.dat -text
+*.zip -text
