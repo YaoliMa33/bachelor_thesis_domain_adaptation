@@ -17,6 +17,13 @@ python uci_training/dann_cdan_lc/main.py
 python uci_training/dann_cdan_lc/test.py
 ```
 
+For an initial run with two seeds and the full training budget:
+
+```bash
+python uci_training/dann_cdan_lc/main.py --seeds 0 1
+python uci_training/dann_cdan_lc/test.py --seeds 0 1
+```
+
 Select `--uci-protocol long|medium|both`; the default is `both`:
 
 - Setting B (long-term): B1 → B2,…,B10, nine tasks.

@@ -13,7 +13,15 @@ Domain adaptation experiments for gas recognition using the self-collected ST da
 
 ## Environment
 
-Verified with Python 3.12.14, NumPy 2.5.3, scikit-learn 1.9.0, and PyTorch 2.14.0+cpu. Training uses one CPU thread.
+Verified on 64-bit Windows with Python 3.12.14, NumPy 2.5.3, scikit-learn 1.9.0, and PyTorch 2.14.0+cpu. Training uses one CPU thread. Start with Python 3.12 and a separate environment:
+
+```bash
+git clone https://github.com/YaoliMa33/bachelor_thesis_domain_adaptation.git
+cd bachelor_thesis_domain_adaptation
+python -m venv .venv
+```
+
+Activate it with `.venv\Scripts\activate.bat` in Windows Command Prompt, `.\.venv\Scripts\Activate.ps1` in PowerShell, or `source .venv/bin/activate` in a Unix shell. Then install the dependencies (the CPU-wheel command below is for Windows/Linux):
 
 ```bash
 python -m pip install numpy==2.5.3 scikit-learn==1.9.0

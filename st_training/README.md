@@ -13,6 +13,13 @@ python st_training/dann_cdan_lc/main.py
 python st_training/dann_cdan_lc/test.py
 ```
 
+For an initial run with two seeds and the full training budget:
+
+```bash
+python st_training/dann_cdan_lc/main.py --seeds 0 1
+python st_training/dann_cdan_lc/test.py --seeds 0 1
+```
+
 Use `--data PATH` for a feature CSV, `--output PATH` for an output directory, and `--seeds 0 1` to select seeds. Training and summarization must use the same output path and seeds. Set models and parameters in [params.py](dann_cdan_lc/params.py); for example, `METHODS = ("CDANLC",)` selects one model.
 
 ## Protocols and defaults
