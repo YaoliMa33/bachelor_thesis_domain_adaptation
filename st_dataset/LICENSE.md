@@ -19,4 +19,5 @@ Suggested attribution: Gas Sensor Drift project contributors (2026),
 Include the repository URL and the version used when citing or redistributing
 these files.
 
-The UCI dataset is separate and is not covered by this grant.
+The UCI dataset and the third-party firmware in `arduino/` are separate and
+are not covered by this grant. See [firmware source notices](arduino/README.md#provenance-and-license).

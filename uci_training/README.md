@@ -1,78 +1,78 @@
-# UCI 训练
+# UCI Training
 
-[项目首页与环境安装](../README.md) · [UCI 数据说明](../uci_dataset_128d/README.md)
+[Environment setup](../README.md#environment) · [Dataset guide](../uci_dataset_128d/README.md)
 
-| 模块 | 内容 |
+| Module | Role |
 |---|---|
-| [dann_cdan_lc](dann_cdan_lc) | DANN、DANNLC、CDAN、CDANLC 的共用实现 |
-| [entropy/train.py](entropy/train.py) | 熵条件加权（+E），复用基础训练循环 |
-| [mspa](mspa/README.md) | 多种子训练入口和 softmax 概率平均评估 |
+| [dann_cdan_lc](dann_cdan_lc) | Shared DANN, DANNLC, CDAN, and CDANLC implementation |
+| [entropy/train.py](entropy/train.py) | Entropy conditioning (+E), using the shared training loop |
+| [mspa](mspa/README.md) | Multi-seed training and probability averaging |
 
-## 基础模型
+## Base models
 
-从仓库根目录执行，默认四个模型、种子 0–19：
+Run from the repository root. Defaults are all four models and seeds 0–19:
 
 ```bash
 python uci_training/dann_cdan_lc/main.py
 python uci_training/dann_cdan_lc/test.py
 ```
 
-`--uci-protocol long|medium|both` 选择协议，默认 `both`：
+Select `--uci-protocol long|medium|both`; the default is `both`:
 
-- Setting B（长期）：B1 → B2,…,B10，共九个任务。
-- Setting C（中期）：Bk → B(k+1)，k=1,…,9，包含 B5 → B6。
+- Setting B (long-term): B1 → B2,…,B10, nine tasks.
+- Setting C (medium-term): Bk → B(k+1), k=1,…,9, including B5 → B6.
 
-每个任务重新初始化，标准化按本任务源批次拟合。运行 `both` 时，B1 → B2 只训练一次，计入两个协议。
+Each task starts from a fresh initialization, with standardization fitted on its source batch. With `both`, B1 → B2 is trained once and included in both settings.
 
-`--data PATH` 指定含十个 batch 文件的目录；`--output PATH` 指定输出根目录；`--seeds 0 1` 可选择种子。训练与汇总的输出路径、种子及协议须一致。修改 [params.py](dann_cdan_lc/params.py) 中的 `METHODS` 可选择模型，例如 `("CDANLC",)`。
+Use `--data PATH` for the batch-file directory, `--output PATH` for an output directory, and `--seeds 0 1` to select seeds. Training and summarization must use matching paths, seeds, and protocols. Select models in [params.py](dann_cdan_lc/params.py), for example `METHODS = ("CDANLC",)`.
 
-## 共用参数与方法
+## Shared defaults
 
-| 参数 | 默认值 |
+| Parameter | Default |
 |---|---|
-| 输入／类别／特征隐藏维度 | 128／6／200 |
-| 特征提取器 | Linear → BatchNorm → ReLU；源、目标联合 BN |
-| 域判别器隐藏层／谱范数上限 | 64 → 64／1.0 |
-| 每域 minibatch／更新次数 | 16／450（45 × 10） |
-| 优化器／初始学习率 | SGD，momentum=0.9／0.03；weight decay=0 |
-| 学习率调度 | 每记录区间余弦衰减，eta_min=1e-6 |
-| 域损失／LC 权重 | 0.8／0.2；DANN、CDAN 的 LC 权重为 0 |
-| GRL | gamma=10，覆盖全部 450 步 |
-| 源域采样 | 按类别比例分配并分层循环采样 |
-| 目标域采样 | 跨记录区间连续采样，拼接余样本 |
+| Input / classes / feature dimension | 128 / 6 / 200 |
+| Feature extractor | Linear → BatchNorm → ReLU; joint source–target BN |
+| Domain hidden layers / spectral cap | 64 → 64 / 1.0 |
+| Minibatch per domain / updates | 16 / 450 (45 × 10) |
+| Optimizer / initial learning rate | SGD, momentum=0.9 / 0.03; weight decay=0 |
+| Learning-rate schedule | Cosine decay per recording interval, eta_min=1e-6 |
+| Domain / LC weight | 0.8 / 0.2; LC is zero for DANN and CDAN |
+| GRL | gamma=10, scheduled over all 450 updates |
+| Source sampling | Stratified cycling, with allocation proportional to class counts |
+| Target sampling | Continuous across intervals, carrying over incomplete batches |
 
-`epoch` 是固定 10 次更新的记录区间。预处理为 asinh 后按源域统计量做 z-score。初始化在网络构建后按种子重置。DANN 使用特征作域输入，CDAN 使用特征与 detached 类别概率的外积。LC 对齐源类中心和目标软概率加权中心，只计入源小批次出现的类别。域判别器在初始化及每次更新后进行谱范数投影。
+An `epoch` is a recording interval of ten updates. Preprocessing applies asinh followed by z-score standardization fitted on the source domain. Initialization is reset using the seed after network construction. DANN uses features as domain inputs; CDAN uses their outer product with detached class probabilities. LC aligns source class centers with centers weighted by target class probabilities, using classes present in the source minibatch. Domain weights are projected onto the spectral-norm constraint at initialization and after each update.
 
-基础模块分工：`main.py` 管理任务；`loaddataset.py` 读取和预处理数据；`model.py` 定义网络；`train.py` 计算损失及优化；`test.py` 评估和汇总；`utils.py` 处理采样及保存。
+In the shared module, `main.py` manages tasks, `loaddataset.py` loads and preprocesses data, `model.py` defines networks, `train.py` handles optimization, `test.py` evaluates and summarizes, and `utils.py` handles sampling and saving.
 
-## 熵条件加权（+E）
+## Entropy conditioning (+E)
 
-支持四个基础模型的 +E 变体，默认仅长期协议，其他参数沿用共用配置：
+The extension supports all four models. It defaults to the long-term protocol and uses the shared parameters:
 
 ```bash
 python uci_training/entropy/train.py
 python uci_training/dann_cdan_lc/test.py --output uci_training/entropy/results --uci-protocol long
 ```
 
-使用 `H = -sum(p * log(p + 1e-5))`、`w = 1 + exp(-H)` 加权域分类损失，源、目标权重分别归一化；归一化分母 detach，熵分支使用相同 GRL 系数。参考 [CDAN 官方实现](https://github.com/thuml/CDAN/blob/master/pytorch/loss.py)，DANN 系列的 +E 为本项目扩展。
+Domain loss is weighted using `H = -sum(p * log(p + 1e-5))` and `w = 1 + exp(-H)`. Source and target weights are normalized separately with detached denominators; the entropy branch uses the same GRL coefficient. This follows the [CDAN implementation](https://github.com/thuml/CDAN/blob/master/pytorch/loss.py); applying +E to DANN is an extension in this project.
 
-默认输出至 `entropy/results/UCI/`。JSON 保留基础模型名，并以 `entropy_conditioning`、`variant` 标明 +E；汇总中的 LC 增益比较同为 +E 的模型，不表示 E 相对基础模型的增益。
+Results go to `entropy/results/UCI/`. Records retain the base model name and identify +E through `entropy_conditioning` and `variant`. Reported LC gains compare models that both use +E; they do not measure the gain from adding E.
 
-## 多随机种子概率平均（MSPA）
+## Multi-seed probability averaging (MSPA)
 
 ```bash
 python uci_training/mspa/train.py
 python uci_training/mspa/evaluate.py
 ```
 
-训练直接复用基础模型，不启用 +E。评估需要所选模型与任务的完整种子池 0–19；默认每组 7 个成员，先平均 softmax 概率，再取预测类别。已有基础权重时用 `--members uci_training/dann_cdan_lc/results` 复用。
+MSPA trains the base models without +E. Evaluation requires seeds 0–19 for every selected model and task. By default, each group contains seven members; their softmax probabilities are averaged before choosing a class. To reuse existing base-model checkpoints, pass `--members uci_training/dann_cdan_lc/results`.
 
-成员分组、数量分析、输出与重叠组标准差的解释见 [MSPA 说明](mspa/README.md)。
+See the [MSPA guide](mspa/README.md) for grouping, ensemble-size comparisons, and output files.
 
-## 输出与统计
+## Outputs and statistics
 
-基础训练输出至 `dann_cdan_lc/results/UCI/`，按种子、任务、模型保存 JSON 和最终 `.pt` 权重；相同路径重跑会覆盖同名文件。评估固定最后一步模型。`test.py` 汇总已有结果，不重新训练。
+Base training saves JSON records and final `.pt` checkpoints under `dann_cdan_lc/results/UCI/`, grouped by seed, task, and model. Reusing an output path overwrites matching files. Evaluation uses the final model; `test.py` summarizes saved results without retraining.
 
-每个种子先对九个任务准确率等权平均，再报告种子间均值和样本标准差（ddof=1）。JSON 保存逐种子均值、均值／SD 和配对 LC 增益，CSV 保存均值和平均增益。一个种子的 SD 为 `null`；仅当同系列两个模型都被选中时计算 LC 增益。
+Accuracy is averaged equally over the nine tasks within each seed, then summarized across seeds as mean and sample SD (`ddof=1`). JSON includes seed means, mean/SD, and paired LC gains; CSV contains means and mean gains. SD is `null` for one seed. Paired gains require both models in a family.
 
-目标标签不参与反向传播或 checkpoint 选择；参数与预算曾参考目标评估结果选择，结果属于探索性比较。默认结果、权重与缓存已被 `.gitignore` 排除，自定义输出建议放在仓库外。
+Target labels do not enter backpropagation or checkpoint selection. Parameters and training budgets were chosen with reference to target performance, so the comparisons are exploratory. Default results, checkpoints, and caches are ignored by Git; use a location outside the repository for custom outputs.
