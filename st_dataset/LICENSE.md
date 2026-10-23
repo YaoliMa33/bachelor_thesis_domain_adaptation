@@ -8,7 +8,7 @@ The [full legal terms](https://creativecommons.org/licenses/by/4.0/legalcode.en)
 
 This grant covers the 303 raw acquisition CSV files in `st_raw/st_raw_csv.zip`,
 `st_raw/sample_manifest.csv`, and the extracted features in
-`st_54d/features_54d.csv`, together with their dataset documentation.
+`st_54d/features_54d.csv`, together with their dataset documentation, phase-audit records and explicitly generated cleaned data copies. New extraction and validation software uses the root MIT license.
 
 You may share and adapt this material, including for commercial purposes,
 subject to the license. Give appropriate credit, link to the license, and
@@ -19,5 +19,6 @@ Suggested attribution: Gas Sensor Drift project contributors (2026),
 Include the repository URL and the version used when citing or redistributing
 these files.
 
-The UCI dataset and the third-party firmware in `arduino/` are separate and
-are not covered by this grant. See [firmware source notices](arduino/README.md#provenance-and-license).
+The UCI dataset and software under `arduino/` are not covered by this data grant.
+The original third-party hardware firmware is not distributed here; the new
+standalone parser uses the root MIT license. See [source notices](arduino/README.md#provenance-and-license).

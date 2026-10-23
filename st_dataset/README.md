@@ -9,7 +9,9 @@ The ST dataset contains 303 recordings from three gas classes across six batches
 | [st_54d/features_54d.csv](st_54d/features_54d.csv) | Extracted features used directly for training |
 | [st_raw/st_raw_csv.zip](st_raw/st_raw_csv.zip) | The 303 original time-series CSV files |
 | [st_raw/sample_manifest.csv](st_raw/sample_manifest.csv) | Sample IDs, labels, batches, and raw file paths |
-| [arduino](arduino/README.md) | Firmware supplied for the acquisition hardware |
+| [extract_features.py](extract_features.py) | Rebuild and verify all 54 features from the original ZIP |
+| [FEATURE_EXTRACTION.md](FEATURE_EXTRACTION.md) | Exact windows, formulas and cleaning rules |
+| [arduino](arduino/README.md) | Hardware provenance and a standalone serial-command parser |
 
 ## Features and labels
 
@@ -30,6 +32,6 @@ The features were extracted after per-record baseline correction. They have not 
 
 ## Raw recordings and license
 
-Training does not require extracting the raw CSV archive. To inspect the recordings, extract it into `st_raw` and use the manifest’s `target_file` paths. See the [raw data guide](st_raw/README.md) for fields, timestamps, and labels.
+Training uses the preserved feature table directly. To reconstruct and verify it, run `python st_dataset/extract_features.py --verify --clean-archive` from the repository root. See the [extraction specification](FEATURE_EXTRACTION.md) for windows and formulas, and the [raw data guide](st_raw/README.md) for timestamps and documented cleaning.
 
-The recordings, manifest, and extracted features use [CC BY 4.0](LICENSE.md). The Arduino firmware has [separate source notices](arduino/README.md#provenance-and-license).
+The recordings, manifest, and extracted features use [CC BY 4.0](LICENSE.md). The original hardware firmware is excluded from this source distribution; the included parser has [separate provenance notes](arduino/README.md#provenance-and-license).

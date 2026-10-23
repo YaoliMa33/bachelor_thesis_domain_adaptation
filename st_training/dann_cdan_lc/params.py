@@ -27,7 +27,10 @@ class Config:
     gamma: float = 3.0
     spectral_cap: float = 0.75
     epsilon: float = 1e-08
-    # Random source mini-batches; no fixed per-class allocation (e.g. 4/8/8).
-    source_sampling: str = 'loader'
+    # Class order: air, alcohol, acetone.
+    source_sampling: str = 'stratified'
+    source_class_counts: tuple[int, ...] = (4, 8, 8)
+    # 完全随机采样（不固定类别配额）：取消下一行注释即可启用。
+    # source_sampling: str = 'loader'
     target_sampling: str = 'loader'
 

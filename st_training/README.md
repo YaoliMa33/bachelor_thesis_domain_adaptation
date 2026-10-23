@@ -43,9 +43,10 @@ Protocol 1 trains one model per seed and method. Protocols 2 and 3 reinitialize 
 | Optimizer / learning rate / weight decay | Adam / 0.005, fixed / 0.0001 |
 | Domain / LC weight | 0.9 / 1.2; LC is zero for DANN and CDAN |
 | GRL | gamma=3; increases for 150 updates, then stays fixed |
-| Source and target sampling | Shuffled loaders, restarted each recording interval; incomplete batches dropped |
+| Source sampling | Stratified cycling: 4 air, 8 alcohol, and 8 acetone samples per minibatch |
+| Target sampling | Shuffled loader, restarted each recording interval; incomplete batches dropped |
 
-**The current ST configuration uses random sampling, without fixed 4/8/8 class counts. It differs from the earlier thesis experiments that used stratified source sampling.** An `epoch` is a recording interval of five updates, not a full pass through the data. Optimizer state is retained throughout training.
+An `epoch` is a recording interval of five updates, not a full pass through the data. Optimizer state is retained throughout training. Source samples cycle through a shuffled pool for each class; `source_class_counts = (4, 8, 8)` follows the class order air, alcohol, acetone and must sum to `batch_size`.
 
 Preprocessing applies asinh followed by z-score standardization fitted on the source domain. Initialization is reset using the seed after network construction. DANN uses features as domain inputs; CDAN uses their outer product with detached class probabilities. LC aligns source class centers with centers weighted by target class probabilities, using classes present in the source minibatch. Domain weights are projected onto the spectral-norm constraint at initialization and after each update.
 

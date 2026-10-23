@@ -26,15 +26,16 @@ class Cycle:
 
 
 class Stratified:
-    def __init__(self, labels, batch_size, seed):
-        classes, counts = np.unique(labels, return_counts=True)
-        ideal = counts * batch_size / counts.sum()
-        allocation = np.maximum(1, np.floor(ideal).astype(int))
-        while allocation.sum() < batch_size:
-            allocation[np.argmax(ideal - allocation)] += 1
-        while allocation.sum() > batch_size:
-            eligible = np.where(allocation > 1, allocation - ideal, -np.inf)
-            allocation[np.argmax(eligible)] -= 1
+    def __init__(self, labels, batch_size, seed, class_counts=(4, 8, 8)):
+        labels = np.asarray(labels)
+        allocation = np.asarray(class_counts)
+        if (allocation.ndim != 1 or not len(allocation)
+                or not np.issubdtype(allocation.dtype, np.integer)
+                or np.any(allocation <= 0) or allocation.sum() != batch_size):
+            raise ValueError("source_class_counts must contain positive integers summing to batch_size")
+        classes = np.arange(len(allocation))
+        if labels.ndim != 1 or not np.array_equal(np.unique(labels), classes):
+            raise ValueError("Fixed source sampling requires every configured class and no unknown labels")
         self.counts = allocation
         self.samplers = [Cycle(np.flatnonzero(labels == c), seed + int(c) * 97)
                          for c in classes]
@@ -56,6 +57,8 @@ def make_loaders(source_x, source_y, target_x, config, seed):
 
 
 def repeat(loader):
+    if len(loader) == 0:
+        raise ValueError("Cannot repeat an empty loader; provide enough samples for batch_size or disable drop_last")
     while True:
         yield from loader
 

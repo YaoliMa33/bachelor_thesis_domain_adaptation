@@ -8,6 +8,10 @@
 | [entropy/train.py](entropy/train.py) | Entropy conditioning (+E), using the shared training loop |
 | [mspa](mspa/README.md) | Multi-seed training and probability averaging |
 
+## Data setup
+
+The release does not bundle UCI batch files. First run `python uci_dataset_128d/download.py` from the repository root; all training extensions and MSPA then use the verified local `uci_dataset_128d/data/` directory. See [data source and terms](../uci_dataset_128d/README.md).
+
 ## Base models
 
 Run from the repository root. Defaults are all four models and seeds 0–19:

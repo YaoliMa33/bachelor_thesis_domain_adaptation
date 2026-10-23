@@ -17,6 +17,11 @@ class Task:
 
 
 def load_data(directory):
+    missing = [f"batch{b}.dat" for b in range(1, 11) if not (Path(directory) / f"batch{b}.dat").is_file()]
+    if missing:
+        raise FileNotFoundError(
+            "UCI data are not bundled. Run 'python uci_dataset_128d/download.py' from the repository root "
+            "or pass --data PATH containing all ten batch files. Missing: " + ", ".join(missing))
     batches = {}
     for batch in range(1, 11):
         features, labels = [], []

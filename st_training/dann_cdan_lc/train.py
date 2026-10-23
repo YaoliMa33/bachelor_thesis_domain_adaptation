@@ -54,7 +54,8 @@ def train(method, source_x, source_y, target_x, config, seed):
                                                            eta_min=config.eta_min)
                  if config.scheduler == "cosine" else None)
     source_loader, target_loader = make_loaders(source_x, source_y, target_x, config, seed)
-    stratified = (Stratified(source_y.numpy(), config.batch_size, seed + 11000)
+    stratified = (Stratified(source_y.numpy(), config.batch_size, seed + 11000,
+                             config.source_class_counts)
                   if config.source_sampling == "stratified" else None)
     persistent_target = continuous_target(target_loader) if config.target_sampling == "continuous" else None
     history = []

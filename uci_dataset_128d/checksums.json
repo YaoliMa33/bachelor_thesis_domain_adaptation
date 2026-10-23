@@ -1,0 +1,15 @@
+{
+  "source_url": "https://archive.ics.uci.edu/static/public/270/gas+sensor+array+drift+dataset+at+different+concentrations.zip",
+  "files": {
+    "batch1.dat": "6b62f3e71b90f95dd9c2157fa91ffce32571faa7f474dd52f29a4ae769144625",
+    "batch10.dat": "b8309e8ff205b9d0350761989809f31f8feaefb8582aecb05f1d0f694b91184e",
+    "batch2.dat": "4ea9490068457badf9efd0c22f359fbfce12c208cdd440526b97ac91d31b9002",
+    "batch3.dat": "aabf06bf8b8200740156235dc59458e06d99aa8faba4d6764a22c6b6c2674ff4",
+    "batch4.dat": "ffc87c5146001bbe8ce90c4b2f7dad5b390ca3079f51b559032df53ffe5ff0af",
+    "batch5.dat": "dcad4939c300a6c7d9f41b9470a9253eecc0ebc5c2c4e940d8ae20b8fc4240d0",
+    "batch6.dat": "297d3a8b594dee4e2f4d7d2c4f5c485939fa708c10b5a11ed5cce95e05049afb",
+    "batch7.dat": "eb5801d38a59beaae4a2412195d8ded790175ed1611159e083649ee9fe03d150",
+    "batch8.dat": "58146b3e2dd68b125b2d5432cdd4968ec1fff47464ceb04282382181932d49be",
+    "batch9.dat": "51f368ae8dee5d285be7f2029770e10eb12f342578830bc40ea852db19d19c9b"
+  }
+}

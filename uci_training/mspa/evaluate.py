@@ -68,7 +68,7 @@ def write_csv(path, rows):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path,
-                        default=Path(__file__).resolve().parents[2] / "uci_dataset_128d")
+                        default=Path(__file__).resolve().parents[2] / "uci_dataset_128d/data")
     parser.add_argument("--members", type=Path,
                         default=Path(__file__).resolve().parent / "results",
                         help="Training output root containing UCI/seed_00/... through seed_19.")

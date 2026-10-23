@@ -6,9 +6,9 @@ Domain adaptation experiments for gas recognition using the self-collected ST da
 
 | Folder | Contents |
 |---|---|
-| [st_dataset](st_dataset/README.md) | Raw recordings, 54-dimensional features, and Arduino firmware |
+| [st_dataset](st_dataset/README.md) | Raw recordings, reconstructible 54-dimensional features, and serial protocol |
 | [st_training](st_training/README.md) | ST training protocols, parameters, and evaluation |
-| [uci_dataset_128d](uci_dataset_128d/README.md) | UCI features, labels, sources, and citations |
+| [uci_dataset_128d](uci_dataset_128d/README.md) | Official UCI download, checksums, labels, and citations |
 | [uci_training](uci_training/README.md) | Long- and medium-term UCI experiments, +E, and MSPA |
 
 ## Environment
@@ -30,9 +30,19 @@ python -m pip install torch==2.14.0 --index-url https://download.pytorch.org/whl
 
 Run the commands in each training guide from the repository root. Defaults are four models and seeds 0–19, with 300 updates for ST and 450 for UCI. Results and model checkpoints are generated locally and are not included.
 
+Before UCI training, download and verify the provider data. Reconstruct ST features and run regression checks with:
+
+```bash
+python uci_dataset_128d/download.py
+python st_dataset/extract_features.py --verify --clean-archive
+python -m unittest discover -s tests -v
+```
+
+The [standalone serial parser](st_dataset/arduino/README.md) has a separate C++ regression test. Create a source-only distribution with `python tools/build_release.py --output release/source.zip`; downloaded UCI files, third-party hardware firmware, model outputs, caches and Git history are excluded.
+
 ## Licenses
 
-The project’s Python code and general documentation use the [MIT license](LICENSE). The ST data use [CC BY 4.0](st_dataset/LICENSE.md). The [UCI data](uci_dataset_128d/README.md#sources-and-license) and [Arduino firmware](st_dataset/arduino/README.md#provenance-and-license) retain their separate source notices.
+The project’s Python code, new standalone serial parser and general documentation use the [MIT license](LICENSE). The ST data use [CC BY 4.0](st_dataset/LICENSE.md). [UCI data](uci_dataset_128d/README.md#sources-and-license) are downloaded directly from their provider and are not redistributed in the source package. The original hardware-specific firmware is [excluded pending redistribution permission](st_dataset/arduino/README.md#provenance-and-license); it is not relicensed by this project.
 
 ## References
 

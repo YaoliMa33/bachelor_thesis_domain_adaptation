@@ -56,6 +56,8 @@ def make_loaders(source_x, source_y, target_x, config, seed):
 
 
 def repeat(loader):
+    if len(loader) == 0:
+        raise ValueError("Cannot repeat an empty loader; provide enough samples for batch_size or disable drop_last")
     while True:
         yield from loader
 

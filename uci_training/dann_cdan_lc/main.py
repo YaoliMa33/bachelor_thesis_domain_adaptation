@@ -16,7 +16,7 @@ from utils import save_result
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=Path,
-                        default=Path(__file__).resolve().parents[2] / "uci_dataset_128d")
+                        default=Path(__file__).resolve().parents[2] / "uci_dataset_128d/data")
     parser.add_argument("--output", type=Path,
                         default=Path(__file__).resolve().parent / "results")
     parser.add_argument("--seeds", type=int, nargs="+", default=list(range(20)))
