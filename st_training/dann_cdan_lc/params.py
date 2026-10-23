@@ -30,7 +30,7 @@ class Config:
     # Class order: air, alcohol, acetone.
     source_sampling: str = 'stratified'
     source_class_counts: tuple[int, ...] = (4, 8, 8)
-    # 完全随机采样（不固定类别配额）：取消下一行注释即可启用。
+    # Fully random sampling (no fixed class quotas): uncomment the next line.
     # source_sampling: str = 'loader'
     target_sampling: str = 'loader'
 

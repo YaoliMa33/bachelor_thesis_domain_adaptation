@@ -10,14 +10,14 @@ From the repository root, train all four models with seeds 0–19 and summarize 
 
 ```bash
 python st_training/dann_cdan_lc/main.py
-python st_training/dann_cdan_lc/test.py
+python st_training/dann_cdan_lc/evaluate.py
 ```
 
 For an initial run with two seeds and the full training budget:
 
 ```bash
 python st_training/dann_cdan_lc/main.py --seeds 0 1
-python st_training/dann_cdan_lc/test.py --seeds 0 1
+python st_training/dann_cdan_lc/evaluate.py --seeds 0 1
 ```
 
 Use `--data PATH` for a feature CSV, `--output PATH` for an output directory, and `--seeds 0 1` to select seeds. Training and summarization must use the same output path and seeds. Set models and parameters in [params.py](dann_cdan_lc/params.py); for example, `METHODS = ("CDANLC",)` selects one model.
@@ -52,11 +52,11 @@ Preprocessing applies asinh followed by z-score standardization fitted on the so
 
 ## Outputs and statistics
 
-Training writes JSON records and final `.pt` checkpoints under `dann_cdan_lc/results/ST/`, grouped by seed, task, and model. Reusing an output path overwrites matching files. Evaluation uses the final model; `test.py` summarizes saved results without retraining.
+Training writes JSON records and final `.pt` checkpoints under `dann_cdan_lc/results/ST/`, grouped by seed, task, and model. Saving and summarization reject existing records with different parameters, task identities, seeds or model variants. A rerun with matching settings overwrites matching files; use a new output directory for a new experiment. Summarization validates records against the current `params.py`. Evaluation uses the final model; `evaluate.py` summarizes saved results without retraining.
 
 Accuracy is averaged equally over the five target batches within each seed, then summarized across seeds as mean and sample SD (`ddof=1`). JSON includes seed means, mean/SD, and paired LC gains; CSV contains means and mean gains. SD is `null` for one seed. Paired gains are calculated only when both models in a family are selected.
 
-Target labels do not enter backpropagation or checkpoint selection. Parameters and training budgets were chosen with reference to target performance, so the comparisons are exploratory. Default results, checkpoints, and caches are ignored by Git; use a location outside the repository for custom outputs.
+Target labels do not enter backpropagation or checkpoint selection. Default results, checkpoints, and caches are ignored by Git; use a location outside the repository for custom outputs.
 
 ## Files
 
@@ -67,5 +67,5 @@ Target labels do not enter backpropagation or checkpoint selection. Parameters a
 | params.py | Parameters and model selection |
 | model.py | Networks, initialization, GRL, and spectral projection |
 | train.py | Losses and optimization |
-| test.py | Accuracy evaluation and result summaries |
+| evaluate.py | Accuracy evaluation and result summaries |
 | utils.py | Sampling and saving |

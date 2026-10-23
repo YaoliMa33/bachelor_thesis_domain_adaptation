@@ -1,6 +1,7 @@
 """Average probabilities from the fixed 20-seed pool and summarize MSPA."""
 import argparse
 from collections import defaultdict
+from dataclasses import asdict, replace
 import csv
 import json
 from pathlib import Path
@@ -13,6 +14,7 @@ import torch
 from loaddataset import load_data, preprocess, tasks
 from model import build_model
 from params import Config, METHODS
+from utils import load_result
 
 SEEDS = tuple(range(20))
 OFFSETS = (0, 7, 13, 3, 17, 5, 11, 1, 9, 15, 2, 12, 4, 8, 16, 6, 10, 14, 18, 19)
@@ -25,8 +27,14 @@ def seed_groups(size):
 
 
 @torch.no_grad()
-def member_probabilities(folder, method, seed, target_x):
-    record = json.loads((folder / f"{method}.json").read_text(encoding="utf-8"))
+def member_probabilities(folder, method, seed, target_x, task):
+    config = Config()
+    config = replace(config, lc_weight=config.lc_weight if method.endswith("LC") else 0.0)
+    record = load_result(folder / f"{method}.json", dataset="UCI", method=method,
+                         seed=seed, task=asdict(task), config=asdict(config))
+    if not (folder / f"{method}.pt").is_file():
+        raise ValueError(f"Missing checkpoint: {folder / (method + '.pt')}. "
+                         "Train all seeds 0-19 with matching parameters before MSPA evaluation.")
     model = build_model(method, Config(**record["config"]), seed)
     model.load_state_dict(torch.load(folder / f"{method}.pt",
                                      map_location="cpu", weights_only=True))
@@ -88,7 +96,7 @@ def main():
         for method in METHODS:
             probabilities = np.stack([
                 member_probabilities(args.members / "UCI" / f"seed_{seed:02d}" / task.name,
-                                     method, seed, target_x) for seed in SEEDS])
+                                     method, seed, target_x, task) for seed in SEEDS])
             for size, members in groups.items():
                 accuracies = ensemble_accuracies(probabilities, labels, members)
                 for setting, batch in task.memberships:
@@ -113,4 +121,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (ValueError, OSError) as exc:
+        raise SystemExit(f"MSPA evaluation failed: {exc}") from None

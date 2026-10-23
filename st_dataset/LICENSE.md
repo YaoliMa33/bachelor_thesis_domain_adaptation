@@ -1,6 +1,6 @@
 # ST dataset license — CC BY 4.0
 
-Copyright (c) 2026 Gas Sensor Drift project contributors.
+Copyright (c) 2026 Yaoli Ma.
 
 The self-collected ST dataset in this directory is licensed under the
 [Creative Commons Attribution 4.0 International license (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
@@ -14,7 +14,7 @@ You may share and adapt this material, including for commercial purposes,
 subject to the license. Give appropriate credit, link to the license, and
 indicate any modifications. Do not imply endorsement by the dataset creators.
 
-Suggested attribution: Gas Sensor Drift project contributors (2026),
+Suggested attribution: Yaoli Ma (2026),
 *ST gas sensor dataset: 303 recordings and 54-dimensional features*, CC BY 4.0.
 Include the repository URL and the version used when citing or redistributing
 these files.

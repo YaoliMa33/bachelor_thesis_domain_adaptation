@@ -24,7 +24,7 @@ python uci_training/mspa/evaluate.py --sizes 1 3 5 7 10 12 15 20 --output uci_tr
 python uci_training/mspa/evaluate.py --members uci_training/dann_cdan_lc/results --uci-protocol long
 ```
 
-Both entry points accept `--data`, `--output`, and `--uci-protocol long|medium|both`. Training also accepts `--seeds`; evaluation requires the complete pool 0–19 for each selected model and task. `--members` points to the training output root, not its `UCI` subfolder. Select models in [params.py](../dann_cdan_lc/params.py); checkpoint JSON records supply the configuration used to reconstruct each member.
+Both entry points accept `--data`, `--output`, and `--uci-protocol long|medium|both`. Training also accepts `--seeds`; evaluation requires the complete pool 0–19 for each selected model and task. `--members` points to the training output root, not its `UCI` subfolder. Select models in [params.py](../dann_cdan_lc/params.py); checkpoint JSON records are checked against the current parameters, task, model and seed before loading. Base models and +E records cannot be mixed. Missing records or checkpoints stop evaluation with an explicit error.
 
 Defaults are 450 training updates, domain weight 0.8, LC weight 0.2 for LC models, and both protocols. All nine medium-term tasks are included. The shared B1 → B2 task is trained once. No checkpoint or member is selected by target accuracy.
 
@@ -40,7 +40,7 @@ For size M and group g, take the first M offsets below and use `(g + offset) % 2
 
 For M<20, g=0,…,19 gives 20 groups, shared across models and tasks; each seed appears in M groups. M=20 gives one unique ensemble.
 
-Average accuracy equally across the nine tasks within each group, then report the group mean and sample SD (`ddof=1`). Groups overlap, so SD describes composition variation within the fixed seed pool, not independent repeated experiments or a confidence interval. For M=20, SD is `null` in JSON and blank in CSV. The reference size of seven was chosen through exploratory comparisons.
+Average accuracy equally across the nine tasks within each group, then report the group mean and sample SD (`ddof=1`). Groups overlap, so SD describes composition variation within the fixed seed pool, not independent repeated experiments or a confidence interval. For M=20, SD is `null` in JSON and blank in CSV.
 
 ## Outputs
 

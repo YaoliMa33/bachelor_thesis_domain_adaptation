@@ -1,5 +1,6 @@
 """Mini-batch sampling and experiment-result saving."""
 import json
+from pathlib import Path
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
@@ -74,7 +75,44 @@ def continuous_target(loader):
 
 
 def save_result(folder, method, model, record):
+    file = folder / f"{method}.json"
+    if file.exists():
+        load_result(file, dataset=record["dataset"], method=method, seed=record["seed"],
+                    task=record["task"], config=record["config"],
+                    entropy_conditioning=record.get("entropy_conditioning", False))
     folder.mkdir(parents=True, exist_ok=True)
     (folder / f"{method}.json").write_text(
         json.dumps(record, indent=2), encoding="utf-8")
     torch.save(model.state_dict(), folder / f"{method}.pt")
+
+
+def load_result(file, *, dataset, method, seed, task, config, entropy_conditioning=False):
+    """Reject missing, stale or mismatched records before using their results."""
+    file = Path(file)
+    if not file.is_file():
+        raise ValueError(f"Missing training record: {file}. Run training first with the same "
+                         "output directory, methods, seeds and protocol.")
+    try:
+        record = json.loads(file.read_text(encoding="utf-8"))
+    except (ValueError, UnicodeError) as exc:
+        raise ValueError(f"Invalid training record: {file}. Retrain this task.") from exc
+    if not isinstance(record, dict):
+        raise ValueError(f"Invalid training record object: {file}")
+    normalize = lambda value: json.loads(json.dumps(value))
+    expected = dict(dataset=dataset, method=method, seed=seed, config=normalize(config))
+    mismatches = [key for key, value in expected.items() if record.get(key) != value]
+    stored_task = record.get("task")
+    # Memberships can differ when the same B1->B2 model serves both UCI protocols.
+    if not isinstance(stored_task, dict) or any(
+            stored_task.get(key) != normalize(task[key])
+            for key in ("name", "source", "targets", "evaluations")):
+        mismatches.append("task")
+    expected_variant = method + ("+E" if entropy_conditioning else "")
+    if (record.get("entropy_conditioning", False) is not entropy_conditioning
+            or record.get("variant", method) != expected_variant):
+        mismatches.append("variant (+E/base)")
+    if mismatches:
+        raise ValueError(f"Incompatible training record: {file}; mismatched "
+                         + ", ".join(mismatches)
+                         + ". Use matching parameters and variant, or retrain in a new output directory.")
+    return record

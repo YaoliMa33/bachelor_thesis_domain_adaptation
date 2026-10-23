@@ -2,6 +2,14 @@
 
 Domain adaptation experiments for gas recognition using the self-collected ST dataset and the public UCI dataset. The repository includes DANN, CDAN, their latent class-center alignment (LC) variants, and UCI extensions for entropy conditioning (+E) and multi-seed probability averaging (MSPA).
 
+## Bachelor thesis
+
+[**Compensating Gas Sensor Drift via Domain Adaptation for Robust Gas Discrimination**](thesis/Compensating_Gas_Sensor_Drift_via_Domain_Adaptation_for_Robust_Gas_Discrimination.pdf)
+
+- **Author:** Yaoli Ma
+- **Advisor:** Dr. Fan Han
+- **Supervisor:** Prof. Dr. Achim J. Lilienthal
+
 ## Repository guide
 
 | Folder | Contents |
@@ -24,9 +32,11 @@ python -m venv .venv
 Activate it with `.venv\Scripts\activate.bat` in Windows Command Prompt, `.\.venv\Scripts\Activate.ps1` in PowerShell, or `source .venv/bin/activate` in a Unix shell. Then install the dependencies (the CPU-wheel command below is for Windows/Linux):
 
 ```bash
-python -m pip install numpy==2.5.3 scikit-learn==1.9.0
 python -m pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r requirements.txt
 ```
+
+On macOS, install with `python -m pip install -r requirements.txt` using the default package index. The recorded verification environment above is Windows.
 
 Run the commands in each training guide from the repository root. Defaults are four models and seeds 0–19, with 300 updates for ST and 450 for UCI. Results and model checkpoints are generated locally and are not included.
 
@@ -42,16 +52,16 @@ For an initial run using two seeds and the full training budget:
 
 ```bash
 python st_training/dann_cdan_lc/main.py --seeds 0 1
-python st_training/dann_cdan_lc/test.py --seeds 0 1
+python st_training/dann_cdan_lc/evaluate.py --seeds 0 1
 python uci_training/dann_cdan_lc/main.py --seeds 0 1
-python uci_training/dann_cdan_lc/test.py --seeds 0 1
+python uci_training/dann_cdan_lc/evaluate.py --seeds 0 1
 ```
 
 Omit `--seeds 0 1` to use all 20 seeds. The [ST guide](st_training/README.md) and [UCI guide](uci_training/README.md) describe the protocols, parameters, +E and MSPA. Training and evaluation save results locally; no precomputed results, checkpoints or experiment reports are included. This repository supports reproduction from the supplied feature inputs; raw acquisition and feature-extraction tools are outside its scope.
 
 ## Licenses
 
-The project's Python code and general documentation use the [MIT license](LICENSE). The ST feature data use [CC BY 4.0](st_dataset/LICENSE.md). [UCI data](uci_dataset_128d/README.md#sources-and-license) are downloaded directly from their provider and are not redistributed in this repository.
+The project's Python code and general documentation use the [MIT license](LICENSE). The ST feature data use [CC BY 4.0](st_dataset/LICENSE.md). [UCI data](uci_dataset_128d/README.md#sources-and-license) are downloaded directly from their provider and are not redistributed in this repository. The thesis PDF is provided separately; the software and dataset licenses do not apply to it.
 
 ## References
 

@@ -18,14 +18,14 @@ Run from the repository root. Defaults are all four models and seeds 0–19:
 
 ```bash
 python uci_training/dann_cdan_lc/main.py
-python uci_training/dann_cdan_lc/test.py
+python uci_training/dann_cdan_lc/evaluate.py
 ```
 
 For an initial run with two seeds and the full training budget:
 
 ```bash
 python uci_training/dann_cdan_lc/main.py --seeds 0 1
-python uci_training/dann_cdan_lc/test.py --seeds 0 1
+python uci_training/dann_cdan_lc/evaluate.py --seeds 0 1
 ```
 
 Select `--uci-protocol long|medium|both`; the default is `both`:
@@ -54,7 +54,7 @@ Use `--data PATH` for the batch-file directory, `--output PATH` for an output di
 
 An `epoch` is a recording interval of ten updates. Preprocessing applies asinh followed by z-score standardization fitted on the source domain. Initialization is reset using the seed after network construction. DANN uses features as domain inputs; CDAN uses their outer product with detached class probabilities. LC aligns source class centers with centers weighted by target class probabilities, using classes present in the source minibatch. Domain weights are projected onto the spectral-norm constraint at initialization and after each update.
 
-In the shared module, `main.py` manages tasks, `loaddataset.py` loads and preprocesses data, `model.py` defines networks, `train.py` handles optimization, `test.py` evaluates and summarizes, and `utils.py` handles sampling and saving.
+In the shared module, `main.py` manages tasks, `loaddataset.py` loads and preprocesses data, `model.py` defines networks, `train.py` handles optimization, `evaluate.py` evaluates and summarizes, and `utils.py` handles sampling and saving.
 
 ## Entropy conditioning (+E)
 
@@ -62,7 +62,7 @@ The extension supports all four models. It defaults to the long-term protocol an
 
 ```bash
 python uci_training/entropy/train.py
-python uci_training/dann_cdan_lc/test.py --output uci_training/entropy/results --uci-protocol long
+python uci_training/dann_cdan_lc/evaluate.py --output uci_training/entropy/results --uci-protocol long --entropy-conditioning
 ```
 
 Domain loss is weighted using `H = -sum(p * log(p + 1e-5))` and `w = 1 + exp(-H)`. Source and target weights are normalized separately with detached denominators; the entropy branch uses the same GRL coefficient. This follows the [CDAN implementation](https://github.com/thuml/CDAN/blob/master/pytorch/loss.py); applying +E to DANN is an extension in this project.
@@ -82,8 +82,8 @@ See the [MSPA guide](mspa/README.md) for grouping, ensemble-size comparisons, an
 
 ## Outputs and statistics
 
-Base training saves JSON records and final `.pt` checkpoints under `dann_cdan_lc/results/UCI/`, grouped by seed, task, and model. Reusing an output path overwrites matching files. Evaluation uses the final model; `test.py` summarizes saved results without retraining.
+Base training saves JSON records and final `.pt` checkpoints under `dann_cdan_lc/results/UCI/`, grouped by seed, task, and model. Saving and summarization reject existing records with different parameters, task identities, seeds or model variants. A rerun with matching settings overwrites matching files; use a new output directory for a new experiment. Summarization validates records against the current `params.py`. Evaluation uses the final model; `evaluate.py` summarizes saved results without retraining.
 
 Accuracy is averaged equally over the nine tasks within each seed, then summarized across seeds as mean and sample SD (`ddof=1`). JSON includes seed means, mean/SD, and paired LC gains; CSV contains means and mean gains. SD is `null` for one seed. Paired gains require both models in a family.
 
-Target labels do not enter backpropagation or checkpoint selection. Parameters and training budgets were chosen with reference to target performance, so the comparisons are exploratory. Default results, checkpoints, and caches are ignored by Git; use a location outside the repository for custom outputs.
+Target labels do not enter backpropagation or checkpoint selection. Default results, checkpoints, and caches are ignored by Git; use a location outside the repository for custom outputs.

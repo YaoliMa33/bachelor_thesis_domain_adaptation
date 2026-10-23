@@ -1,4 +1,4 @@
-"""Train and evaluate result A with user-supplied data."""
+"""Train and evaluate ST domain-adaptation experiments."""
 import argparse
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -9,7 +9,7 @@ import torch
 from params import DATASET, METHODS, Config
 from loaddataset import load_data, preprocess, tasks
 from train import train
-from test import evaluate
+from evaluate import evaluate
 from utils import save_result
 
 

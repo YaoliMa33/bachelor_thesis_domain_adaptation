@@ -21,13 +21,15 @@ Class indices are `air → 0`, `alcohol → 1`, and `acetone → 2`.
 
 The features were extracted after per-record baseline correction. They have not been transformed with asinh or z-score standardization. The training loader applies both in memory, fitting the standardization statistics on the source domain only.
 
+The `source_kind` metadata preserves sample provenance. The six source-batch air samples are marked `baseline_as_air`; target batches also include `new` and `reference_as_air` air samples. These provenance fields are not model inputs. Protocol 1 uses the pooled unlabeled target samples during adaptation and evaluates on those same samples; see the training guide for the exact batch access rules.
+
 ## Run and license
 
 From the repository root:
 
 ```bash
 python st_training/dann_cdan_lc/main.py
-python st_training/dann_cdan_lc/test.py
+python st_training/dann_cdan_lc/evaluate.py
 ```
 
 Use `--data PATH` to supply another feature CSV in the same format. The supplied ST feature data and dataset documentation use [CC BY 4.0](LICENSE.md). This directory contains training inputs, not model outputs or experiment reports.
