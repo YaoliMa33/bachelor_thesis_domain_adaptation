@@ -12,7 +12,7 @@ Provider-owned batch files are not redistributed in this source release. After r
 python uci_dataset_128d/download.py
 ```
 
-The script downloads the official archive and verifies all ten batch files against [checksums.json](checksums.json) before installing them into `uci_dataset_128d/data/`. This local data directory is ignored by Git and excluded by the release builder. Existing differing files are never overwritten. To use an already downloaded official ZIP without a network connection:
+The script downloads the official archive and verifies all ten batch files against [checksums.json](checksums.json) before installing them into `uci_dataset_128d/data/`. This local data directory is ignored by Git. Existing differing files are never overwritten. To use an already downloaded official ZIP without a network connection:
 
 ```bash
 python uci_dataset_128d/download.py --archive PATH_TO_OFFICIAL_ZIP

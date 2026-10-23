@@ -6,7 +6,7 @@ Domain adaptation experiments for gas recognition using the self-collected ST da
 
 | Folder | Contents |
 |---|---|
-| [st_dataset](st_dataset/README.md) | Raw recordings, reconstructible 54-dimensional features, and serial protocol |
+| [st_dataset](st_dataset/README.md) | 54-dimensional training inputs, labels, and license |
 | [st_training](st_training/README.md) | ST training protocols, parameters, and evaluation |
 | [uci_dataset_128d](uci_dataset_128d/README.md) | Official UCI download, checksums, labels, and citations |
 | [uci_training](uci_training/README.md) | Long- and medium-term UCI experiments, +E, and MSPA |
@@ -30,19 +30,28 @@ python -m pip install torch==2.14.0 --index-url https://download.pytorch.org/whl
 
 Run the commands in each training guide from the repository root. Defaults are four models and seeds 0–19, with 300 updates for ST and 450 for UCI. Results and model checkpoints are generated locally and are not included.
 
-Before UCI training, download and verify the provider data. Reconstruct ST features and run regression checks with:
+## Reproduce the experiments
+
+Run from the repository root. The ST feature table is included. Download the UCI inputs once before UCI training:
 
 ```bash
 python uci_dataset_128d/download.py
-python st_dataset/extract_features.py --verify --clean-archive
-python -m unittest discover -s tests -v
 ```
 
-The [standalone serial parser](st_dataset/arduino/README.md) has a separate C++ regression test. Create a source-only distribution with `python tools/build_release.py --output release/source.zip`; downloaded UCI files, third-party hardware firmware, model outputs, caches and Git history are excluded.
+For an initial run using two seeds and the full training budget:
+
+```bash
+python st_training/dann_cdan_lc/main.py --seeds 0 1
+python st_training/dann_cdan_lc/test.py --seeds 0 1
+python uci_training/dann_cdan_lc/main.py --seeds 0 1
+python uci_training/dann_cdan_lc/test.py --seeds 0 1
+```
+
+Omit `--seeds 0 1` to use all 20 seeds. The [ST guide](st_training/README.md) and [UCI guide](uci_training/README.md) describe the protocols, parameters, +E and MSPA. Training and evaluation save results locally; no precomputed results, checkpoints or experiment reports are included. This repository supports reproduction from the supplied feature inputs; raw acquisition and feature-extraction tools are outside its scope.
 
 ## Licenses
 
-The project’s Python code, new standalone serial parser and general documentation use the [MIT license](LICENSE). The ST data use [CC BY 4.0](st_dataset/LICENSE.md). [UCI data](uci_dataset_128d/README.md#sources-and-license) are downloaded directly from their provider and are not redistributed in the source package. The original hardware-specific firmware is [excluded pending redistribution permission](st_dataset/arduino/README.md#provenance-and-license); it is not relicensed by this project.
+The project's Python code and general documentation use the [MIT license](LICENSE). The ST feature data use [CC BY 4.0](st_dataset/LICENSE.md). [UCI data](uci_dataset_128d/README.md#sources-and-license) are downloaded directly from their provider and are not redistributed in this repository.
 
 ## References
 
