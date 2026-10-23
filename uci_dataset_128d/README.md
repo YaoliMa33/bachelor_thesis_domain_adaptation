@@ -6,29 +6,29 @@
 
 ## Obtain the data
 
-Provider-owned batch files are not redistributed in this source release. After reviewing the provider terms, run from the repository root:
+UCI batch files are not bundled. Review the provider terms, then run from the repository root:
 
 ```bash
 python uci_dataset_128d/download.py
 ```
 
-The script downloads the official archive and verifies all ten batch files against [checksums.json](checksums.json) before installing them into `uci_dataset_128d/data/`. This local data directory is ignored by Git. Existing differing files are never overwritten. To use an already downloaded official ZIP without a network connection:
+The script downloads the official archive, verifies all ten files against [checksums.json](checksums.json), and installs them into the Git-ignored `uci_dataset_128d/data/`. Existing differing files are never overwritten. For an already downloaded official ZIP:
 
 ```bash
 python uci_dataset_128d/download.py --archive PATH_TO_OFFICIAL_ZIP
 ```
 
-Training and MSPA evaluation use `uci_dataset_128d/data/` by default. `--data PATH` can still point to another directory containing all ten files. Obtaining a local copy does not change the provider's terms.
+All UCI training and MSPA commands use this data directory by default. `--data PATH` accepts another directory containing all ten batch files.
 
 ## Format and labels
 
-The locally downloaded `batch1.dat` through `batch10.dat` retain the official file contents:
+The official `batch1.dat` through `batch10.dat` files use:
 
 ```text
 label; concentration 1:value ... 128:value
 ```
 
-Labels and concentration are excluded from model inputs. The loader subtracts one from each numeric label and applies asinh followed by source-fitted z-score standardization, without changing the files.
+Labels and concentration are excluded from inputs. The loader subtracts one from each label, then applies asinh and source-fitted z-score standardization to the features in memory.
 
 | File label | Training index | Gas |
 |---:|---:|---|
@@ -39,15 +39,15 @@ Labels and concentration are excluded from model inputs. The loader subtracts on
 | 5 | 4 | Acetone |
 | 6 | 5 | Toluene |
 
-[gas_labels.json](gas_labels.json) follows the source page’s explicit numeric-label description. Its historical class-count table uses a conflicting order; the data have not been relabeled to match that table.
+[gas_labels.json](gas_labels.json) follows the provider's explicit numeric-label description, rather than its historical class-count table's conflicting order. Files are not relabeled.
 
 ## Sources and license
 
-Dataset citation: Vergara, A. (2012). *Gas Sensor Array Drift at Different Concentrations*. UCI Machine Learning Repository. [DOI: 10.24432/C5MK6M](https://doi.org/10.24432/C5MK6M).
+Vergara, A. (2012). *Gas Sensor Array Drift at Different Concentrations*. UCI Machine Learning Repository. [DOI: 10.24432/C5MK6M](https://doi.org/10.24432/C5MK6M).
 
-The source page also requests citation of both papers:
+The provider also requests these references:
 
 - Vergara et al. (2012). *Chemical gas sensor drift compensation using classifier ensembles*. Sensors and Actuators B: Chemical.
 - Rodriguez-Lujan et al. (2014). *On the calibration of sensor arrays for pattern recognition using the minimal number of experiments*. Chemometrics and Intelligent Laboratory Systems, 130.
 
-As checked on 23 October 2026, the UCI License section lists CC BY 4.0, while the older Additional Information text restricts use to research and excludes commercial use. This repository records both statements without resolving the conflict or granting further rights. This source release avoids redistributing the dataset; it supplies the official download link and byte-verification hashes only. Confirm the applicable terms with the provider before unrestricted redistribution or commercial use. The project’s code and ST data licenses do not replace the UCI terms.
+As checked on 23 October 2026, the UCI License section lists CC BY 4.0, while older Additional Information restricts use to research and excludes commercial use. This repository does not resolve that conflict or redistribute the data. Confirm the applicable terms with the provider before unrestricted redistribution or commercial use; the project licenses do not replace those terms.

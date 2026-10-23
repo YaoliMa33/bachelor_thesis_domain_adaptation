@@ -2,13 +2,13 @@
 
 [Project overview](../README.md) · [Training guide](../st_training/README.md)
 
-[st_54d/features_54d.csv](st_54d/features_54d.csv) contains the input features for 303 samples from three gas classes across six batches. Training reads this file directly; no hardware or raw-data processing is required.
+[st_54d/features_54d.csv](st_54d/features_54d.csv) supplies 303 samples from three gas classes across six batches. Training reads it directly; no hardware or raw-data processing is required.
 
 ## Features and labels
 
-Each of six sensor channels contributes nine features, giving 54 inputs. The loader reads `s1_*` through `s6_*` in file order. The descriptors are `exp_mean`, `exp_absmax`, `exp_span`, `exp_tail`, `exp_auc_abs`, `rec_mean`, `rec_tail`, `rec_slope`, and `overall_std`. Nine additional metadata columns bring the CSV total to 63; these columns are not model inputs.
+Six sensor channels contribute nine features each, giving 54 inputs. The loader reads `s1_*` through `s6_*` in file order. Each channel provides `exp_mean`, `exp_absmax`, `exp_span`, `exp_tail`, `exp_auc_abs`, `rec_mean`, `rec_tail`, `rec_slope`, and `overall_std`. The other nine columns are metadata, excluded from model inputs.
 
-Class indices are `air → 0`, `alcohol → 1`, and `acetone → 2`.
+Class indices: `air → 0`, `alcohol → 1`, `acetone → 2`.
 
 | Batch | Value in the batch column | Samples |
 |---|---|---:|
@@ -19,17 +19,10 @@ Class indices are `air → 0`, `alcohol → 1`, and `acetone → 2`.
 | B5 | batch4 | 46 |
 | B6 | batch5 | 34 |
 
-The features were extracted after per-record baseline correction. They have not been transformed with asinh or z-score standardization. The training loader applies both in memory, fitting the standardization statistics on the source domain only.
+Features were extracted after per-record baseline correction. The loader applies asinh and z-score standardization in memory, fitting statistics on the source domain only; neither transformation has already been applied to the stored table.
 
-The `source_kind` metadata preserves sample provenance. The six source-batch air samples are marked `baseline_as_air`; target batches also include `new` and `reference_as_air` air samples. These provenance fields are not model inputs. Protocol 1 uses the pooled unlabeled target samples during adaptation and evaluates on those same samples; see the training guide for the exact batch access rules.
+The `source_kind` column records provenance. All six source-batch air samples are `baseline_as_air`; target air samples include `new` and `reference_as_air`. This column is not a model input.
 
-## Run and license
+## Usage and license
 
-From the repository root:
-
-```bash
-python st_training/dann_cdan_lc/main.py
-python st_training/dann_cdan_lc/evaluate.py
-```
-
-Use `--data PATH` to supply another feature CSV in the same format. The supplied ST feature data and dataset documentation use [CC BY 4.0](LICENSE.md). This directory contains training inputs, not model outputs or experiment reports.
+Follow the [training commands](../st_training/README.md#run). The default input is the included feature table; `--data PATH` accepts another CSV with the same schema. ST features and dataset documentation use [CC BY 4.0](LICENSE.md).

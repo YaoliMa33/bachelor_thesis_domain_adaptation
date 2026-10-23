@@ -5,37 +5,30 @@
 | Module | Role |
 |---|---|
 | [dann_cdan_lc](dann_cdan_lc) | Shared DANN, DANNLC, CDAN, and CDANLC implementation |
-| [entropy/train.py](entropy/train.py) | Entropy conditioning (+E), using the shared training loop |
+| [entropy/train.py](entropy/train.py) | Entropy conditioning (+E) |
 | [mspa](mspa/README.md) | Multi-seed training and probability averaging |
 
 ## Data setup
 
-The release does not bundle UCI batch files. First run `python uci_dataset_128d/download.py` from the repository root; all training extensions and MSPA then use the verified local `uci_dataset_128d/data/` directory. See [data source and terms](../uci_dataset_128d/README.md).
+Run `python uci_dataset_128d/download.py` from the repository root before training. All modules use `uci_dataset_128d/data/` by default; see [data source and terms](../uci_dataset_128d/README.md).
 
 ## Base models
 
-Run from the repository root. Defaults are all four models and seeds 0–19:
+From the repository root, train all four models with seeds 0–19, then summarize:
 
 ```bash
 python uci_training/dann_cdan_lc/main.py
 python uci_training/dann_cdan_lc/evaluate.py
 ```
 
-For an initial run with two seeds and the full training budget:
+Append `--seeds 0 1` to both commands for a shorter first run with unchanged update counts. `main.py` accepts `--data PATH` for input files; both commands accept `--output PATH` for results. Select models and parameters in [params.py](dann_cdan_lc/params.py), e.g. `METHODS = ("CDANLC",)`.
 
-```bash
-python uci_training/dann_cdan_lc/main.py --seeds 0 1
-python uci_training/dann_cdan_lc/evaluate.py --seeds 0 1
-```
+Choose `--uci-protocol long|medium|both` (default: `both`):
 
-Select `--uci-protocol long|medium|both`; the default is `both`:
+- **Setting B, long-term:** B1 → B2,…,B10, nine tasks.
+- **Setting C, medium-term:** Bk → B(k+1), k=1,…,9, including B5 → B6.
 
-- Setting B (long-term): B1 → B2,…,B10, nine tasks.
-- Setting C (medium-term): Bk → B(k+1), k=1,…,9, including B5 → B6.
-
-Each task starts from a fresh initialization, with standardization fitted on its source batch. With `both`, B1 → B2 is trained once and included in both settings.
-
-Use `--data PATH` for the batch-file directory, `--output PATH` for an output directory, and `--seeds 0 1` to select seeds. Training and summarization must use matching paths, seeds, and protocols. Select models in [params.py](dann_cdan_lc/params.py), for example `METHODS = ("CDANLC",)`.
+Each task starts from a fresh initialization and source-fitted standardization. With `both`, B1→B2 is trained once and counted in both settings. Training and summarization must use matching paths, seeds and protocols. Target labels are used only for evaluation, never for backpropagation or checkpoint selection.
 
 ## Shared defaults
 
@@ -49,25 +42,25 @@ Use `--data PATH` for the batch-file directory, `--output PATH` for an output di
 | Learning-rate schedule | Cosine decay per recording interval, eta_min=1e-6 |
 | Domain / LC weight | 0.8 / 0.2; LC is zero for DANN and CDAN |
 | GRL | gamma=10, scheduled over all 450 updates |
-| Source sampling | Stratified cycling, with allocation proportional to class counts |
+| Source sampling | Stratified cycling: proportional allocation, at least one sample per present class |
 | Target sampling | Continuous across intervals, carrying over incomplete batches |
 
-An `epoch` is a recording interval of ten updates. Preprocessing applies asinh followed by z-score standardization fitted on the source domain. Initialization is reset using the seed after network construction. DANN uses features as domain inputs; CDAN uses their outer product with detached class probabilities. LC aligns source class centers with centers weighted by target class probabilities, using classes present in the source minibatch. Domain weights are projected onto the spectral-norm constraint at initialization and after each update.
+An `epoch` records ten updates, not a full data pass. Preprocessing is asinh followed by source-fitted z-score standardization. Initialization is reset with the seed after network construction. DANN feeds features to the domain classifier; CDAN feeds their outer product with detached class probabilities. LC aligns source centers with target-probability-weighted centers for classes present in the source minibatch. Domain weights are projected to the spectral cap at initialization and after each update.
 
-In the shared module, `main.py` manages tasks, `loaddataset.py` loads and preprocesses data, `model.py` defines networks, `train.py` handles optimization, `evaluate.py` evaluates and summarizes, and `utils.py` handles sampling and saving.
+The shared files are `main.py` (task loop), `loaddataset.py` (inputs and protocols), `params.py` (settings), `model.py` (networks), `train.py` (optimization), `evaluate.py` (evaluation and summaries), and `utils.py` (sampling, validation and saving).
 
 ## Entropy conditioning (+E)
 
-The extension supports all four models. It defaults to the long-term protocol and uses the shared parameters:
+Supports all four models, using the shared parameters and the long-term protocol by default:
 
 ```bash
 python uci_training/entropy/train.py
 python uci_training/dann_cdan_lc/evaluate.py --output uci_training/entropy/results --uci-protocol long --entropy-conditioning
 ```
 
-Domain loss is weighted using `H = -sum(p * log(p + 1e-5))` and `w = 1 + exp(-H)`. Source and target weights are normalized separately with detached denominators; the entropy branch uses the same GRL coefficient. This follows the [CDAN implementation](https://github.com/thuml/CDAN/blob/master/pytorch/loss.py); applying +E to DANN is an extension in this project.
+Domain weights use `H = -sum(p * log(p + 1e-5))` and `w = 1 + exp(-H)`. Source and target weights are normalized separately with detached denominators; the entropy branch uses the same GRL coefficient. This follows the [CDAN implementation](https://github.com/thuml/CDAN/blob/master/pytorch/loss.py); applying +E to DANN is a project extension.
 
-Results go to `entropy/results/UCI/`. Records retain the base model name and identify +E through `entropy_conditioning` and `variant`. Reported LC gains compare models that both use +E; they do not measure the gain from adding E.
+Records under `uci_training/entropy/results/UCI/` identify +E through `entropy_conditioning` and `variant`. LC gains compare models that both use +E, not the effect of adding E itself.
 
 ## Multi-seed probability averaging (MSPA)
 
@@ -76,14 +69,12 @@ python uci_training/mspa/train.py
 python uci_training/mspa/evaluate.py
 ```
 
-MSPA trains the base models without +E. Evaluation requires seeds 0–19 for every selected model and task. By default, each group contains seven members; their softmax probabilities are averaged before choosing a class. To reuse existing base-model checkpoints, pass `--members uci_training/dann_cdan_lc/results`.
-
-See the [MSPA guide](mspa/README.md) for grouping, ensemble-size comparisons, and output files.
+MSPA averages base-model probabilities without +E. It requires seeds 0–19 for each model and task; default groups contain seven members. See the [MSPA guide](mspa/README.md) for checkpoint reuse, group definitions and ensemble-size comparisons.
 
 ## Outputs and statistics
 
-Base training saves JSON records and final `.pt` checkpoints under `dann_cdan_lc/results/UCI/`, grouped by seed, task, and model. Saving and summarization reject existing records with different parameters, task identities, seeds or model variants. A rerun with matching settings overwrites matching files; use a new output directory for a new experiment. Summarization validates records against the current `params.py`. Evaluation uses the final model; `evaluate.py` summarizes saved results without retraining.
+Base-model JSON records and final `.pt` checkpoints are saved under `uci_training/dann_cdan_lc/results/UCI/`, grouped by seed, task and model. `evaluate.py` summarizes them without retraining and writes `summary.json` and `summary.csv` in that directory.
 
-Accuracy is averaged equally over the nine tasks within each seed, then summarized across seeds as mean and sample SD (`ddof=1`). JSON includes seed means, mean/SD, and paired LC gains; CSV contains means and mean gains. SD is `null` for one seed. Paired gains require both models in a family.
+Saving and summarization reject mismatched configurations, tasks, seeds or variants; summarization checks the current `params.py`. Matching reruns overwrite corresponding files. Use a new output directory for a new experiment; default results and checkpoints are ignored by Git.
 
-Target labels do not enter backpropagation or checkpoint selection. Default results, checkpoints, and caches are ignored by Git; use a location outside the repository for custom outputs.
+For each setting and seed, accuracy (%) is averaged equally over nine tasks; across seeds, report mean and sample SD (`ddof=1`, `null` for one seed). JSON includes seed means, mean/SD and paired LC gains; CSV contains means and mean gains. Gains are in percentage points and require both the base and LC model in a family.
