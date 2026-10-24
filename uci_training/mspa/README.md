@@ -21,7 +21,7 @@ python uci_training/mspa/evaluate.py --members uci_training/dann_cdan_lc/results
 
 Both commands accept `--data`, `--output` and `--uci-protocol long|medium|both` (default: `both`). Training accepts `--seeds`; evaluation requires all seeds 0–19 for every selected model and task. `--members` is the training output root, not its `UCI` subfolder. Models are selected in [params.py](../dann_cdan_lc/params.py).
 
-Evaluation checks records against the current parameters, task, model and seed. Missing files or mismatches stop evaluation; base and +E records cannot be mixed. No member or checkpoint is selected by target accuracy.
+Evaluation checks the current data hashes, parameters, task, model, seed and saved predictions, requires consistent training provenance, and verifies each checkpoint against its JSON hash. Missing files or mismatches stop evaluation; base and +E records cannot be mixed. Old records without provenance require retraining in a new output directory. No member or checkpoint is selected by target accuracy.
 
 ## Averaging and seed groups
 

@@ -13,7 +13,7 @@ python st_training/dann_cdan_lc/main.py
 python st_training/dann_cdan_lc/evaluate.py
 ```
 
-For a shorter first run, append `--seeds 0 1` to both commands; update counts remain unchanged. `main.py` accepts `--data PATH` for the feature CSV. Both commands accept `--output PATH` and must use the same output path and seeds. Select models and parameters in [params.py](dann_cdan_lc/params.py), e.g. `METHODS = ("CDANLC",)`.
+For a shorter first run, append `--seeds 0 1` to both commands; update counts remain unchanged. Both commands accept `--data PATH` and `--output PATH`; use the same input data, output path and seeds for training and summarization. Select models and parameters in [params.py](dann_cdan_lc/params.py), e.g. `METHODS = ("CDANLC",)`.
 
 ## Protocols and defaults
 
@@ -47,9 +47,9 @@ Preprocessing is asinh followed by source-fitted z-score standardization. Initia
 
 JSON records and final `.pt` checkpoints are saved under `st_training/dann_cdan_lc/results/ST/`, grouped by seed, task and model. `evaluate.py` summarizes these records without retraining and writes `summary.json` and `summary.csv` in that directory.
 
-Saving and summarization reject mismatched configurations, tasks, seeds or variants; summarization checks the current `params.py`. Matching reruns overwrite corresponding files. Use a new output directory for a new experiment; default results and checkpoints are ignored by Git.
+Records include input SHA-256 hashes, code hashes, Git revision/dirty status, Python and library versions, and a checkpoint hash. Saving checks existing records before training; summarization validates the current data, configuration, predictions and training provenance. Mixed inputs or training versions are rejected. Use a new output directory for a new experiment or old records without provenance; matching reruns overwrite corresponding files. Default outputs are ignored by Git.
 
-Within each seed, accuracy (%) is averaged equally over five target batches; across seeds, report mean and sample SD (`ddof=1`, `null` for one seed). JSON includes seed means, mean/SD and paired LC gains; CSV contains means and mean gains. Gains are in percentage points and require both the base and LC model in a family.
+Within each seed, accuracy (%) is averaged equally over five target batches; across seeds, report mean and sample SD (`ddof=1`, `null` for one seed). JSON includes seed means, mean/SD and paired LC gains. It also adds `sample_weighted`, computed per seed as `100 × total correct / total samples`, with its own mean, SD and paired gains. CSV retains the equal-weighted columns and adds sample-weighted means and gains. Gains are in percentage points and require both the base and LC model in a family.
 
 ## Files
 

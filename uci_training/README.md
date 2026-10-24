@@ -21,7 +21,7 @@ python uci_training/dann_cdan_lc/main.py
 python uci_training/dann_cdan_lc/evaluate.py
 ```
 
-Append `--seeds 0 1` to both commands for a shorter first run with unchanged update counts. `main.py` accepts `--data PATH` for input files; both commands accept `--output PATH` for results. Select models and parameters in [params.py](dann_cdan_lc/params.py), e.g. `METHODS = ("CDANLC",)`.
+Append `--seeds 0 1` to both commands for a shorter first run with unchanged update counts. Both commands accept `--data PATH` and `--output PATH`; use the same input data, output path and seeds for training and summarization. Select models and parameters in [params.py](dann_cdan_lc/params.py), e.g. `METHODS = ("CDANLC",)`.
 
 Choose `--uci-protocol long|medium|both` (default: `both`):
 
@@ -75,6 +75,6 @@ MSPA averages base-model probabilities without +E. It requires seeds 0–19 for 
 
 Base-model JSON records and final `.pt` checkpoints are saved under `uci_training/dann_cdan_lc/results/UCI/`, grouped by seed, task and model. `evaluate.py` summarizes them without retraining and writes `summary.json` and `summary.csv` in that directory.
 
-Saving and summarization reject mismatched configurations, tasks, seeds or variants; summarization checks the current `params.py`. Matching reruns overwrite corresponding files. Use a new output directory for a new experiment; default results and checkpoints are ignored by Git.
+Records include input SHA-256 hashes, code hashes, Git revision/dirty status, Python and library versions, and a checkpoint hash. Saving checks existing records before training; summarization validates the current data, configuration, predictions and training provenance. Mixed inputs or training versions are rejected. Use a new output directory for a new experiment or old records without provenance; matching reruns overwrite corresponding files. Default outputs are ignored by Git.
 
-For each setting and seed, accuracy (%) is averaged equally over nine tasks; across seeds, report mean and sample SD (`ddof=1`, `null` for one seed). JSON includes seed means, mean/SD and paired LC gains; CSV contains means and mean gains. Gains are in percentage points and require both the base and LC model in a family.
+For each setting and seed, accuracy (%) is averaged equally over nine tasks; across seeds, report mean and sample SD (`ddof=1`, `null` for one seed). JSON includes seed means, mean/SD and paired LC gains. It also adds `sample_weighted`, computed per seed as `100 × total correct / total samples`, with its own mean, SD and paired gains. CSV retains the equal-weighted columns and adds sample-weighted means and gains. Gains are in percentage points and require both the base and LC model in a family.

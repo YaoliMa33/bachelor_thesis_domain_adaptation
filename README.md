@@ -58,7 +58,7 @@ python uci_training/dann_cdan_lc/evaluate.py --seeds 0 1
 
 Omit `--seeds 0 1` for seeds 0–19. Defaults are four models, 300 updates for ST and 450 for UCI. The training guides explain custom parameters, +E, and MSPA.
 
-Reproduction starts from the supplied features. Raw acquisition and feature-extraction tools are outside this repository's scope. Results and checkpoints are generated locally and are not bundled.
+Reproduction starts from the supplied features. Raw acquisition and feature-extraction tools are outside this repository's scope. Results and checkpoints are generated locally and are not bundled. Records include data/code hashes and runtime versions; evaluation checks the training inputs and reports both equal-task and sample-weighted accuracy for ST and UCI base/+E experiments.
 
 ## Licenses
 

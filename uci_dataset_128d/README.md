@@ -18,7 +18,7 @@ The script downloads the official archive, verifies all ten files against [check
 python uci_dataset_128d/download.py --archive PATH_TO_OFFICIAL_ZIP
 ```
 
-All UCI training and MSPA commands use this data directory by default. `--data PATH` accepts another directory containing all ten batch files.
+Training, summarization and MSPA also verify hashes in the default directory. `--data PATH` accepts another directory containing ten valid batch files; their actual hashes are recorded and checked when results are reused.
 
 ## Format and labels
 

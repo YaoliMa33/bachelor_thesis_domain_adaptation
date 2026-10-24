@@ -58,21 +58,13 @@ def main():
     import main as shared_main
 
     shared_main.train = train
-    shared_save_result = shared_main.save_result
-
-    def save_entropy_result(folder, method, model, record):
-        record = dict(record, entropy_conditioning=True,
-                      variant=method + "+E")
-        shared_save_result(folder, method, model, record)
-
-    shared_main.save_result = save_entropy_result
     # Separate output location prevents overwriting the baseline results by default.
     if not any(a == "--output" or a.startswith("--output=") for a in sys.argv[1:]):
         sys.argv.extend(["--output", str(Path(__file__).resolve().parent / "results")])
     if not any(a == "--uci-protocol" or a.startswith("--uci-protocol=") for a in sys.argv[1:]):
         sys.argv.extend(["--uci-protocol", "long"])
     print("Entropy conditioning enabled (+E); shared UCI modules: " + str(SHARED), flush=True)
-    shared_main.main()
+    shared_main.main(entropy_conditioning=True)
 
 
 if __name__ == "__main__":

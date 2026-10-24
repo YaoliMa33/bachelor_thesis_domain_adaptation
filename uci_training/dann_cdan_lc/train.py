@@ -75,6 +75,8 @@ def train(method, source_x, source_y, target_x, config, seed, loss_fn=losses):
             progress = min(epoch * config.steps_per_epoch + step, ramp - 1) / (ramp - 1)
             coefficient = float(2 / (1 + np.exp(-config.gamma * progress)) - 1)
             values = loss_fn(model, method, xs, ys, xt, coefficient, config)
+            if not torch.isfinite(values["total"]):
+                raise ValueError("Non-finite training loss; check input values and configuration.")
             optimizer.zero_grad()
             values["total"].backward()
             optimizer.step()

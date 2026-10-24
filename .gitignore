@@ -16,10 +16,6 @@ results/
 .DS_Store
 Thumbs.db
 
-# Provider-owned data are obtained locally; do not redistribute them in source releases.
+# Local dataset downloads
 /uci_dataset_128d/data/
 /uci_dataset_128d/batch*.dat
-/st_dataset/generated/
-# Unlicensed hardware reference sources must not enter the public package.
-/st_dataset/arduino/eNoseFirmware/
-/release/

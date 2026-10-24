@@ -21,7 +21,9 @@ Class indices: `air → 0`, `alcohol → 1`, `acetone → 2`.
 
 Features were extracted after per-record baseline correction. The loader applies asinh and z-score standardization in memory, fitting statistics on the source domain only; neither transformation has already been applied to the stored table.
 
-The `source_kind` column records provenance. All six source-batch air samples are `baseline_as_air`; target air samples include `new` and `reference_as_air`. This column is not a model input.
+All samples labeled `air` map to class 0, including `baseline_as_air` and `reference_as_air`. The `source_kind` column is metadata only; it does not change class labels or enter model inputs.
+
+[checksums.json](checksums.json) records the published feature-table SHA-256. Training and evaluation check the default file automatically. Custom `--data` files are validated and fingerprinted separately.
 
 ## Usage and license
 
