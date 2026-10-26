@@ -10,6 +10,8 @@ Domain adaptation for gas recognition on the self-collected ST and public UCI da
 - **Advisor:** Dr. Fan Han
 - **Supervisor:** Prof. Dr. Achim J. Lilienthal
 - **Chair:** Chair of Perception for Intelligent Systems
+- **University:** Technical University of Munich
+
 
 ## Repository guide
 
